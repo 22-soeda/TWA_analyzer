@@ -1,0 +1,49 @@
+# --- Python General ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Virtual Environments (venv) ---
+# venvフォルダをGit管理から除外（必須）
+venv/
+.venv/
+env/
+.env/
+
+# --- Distribution / Packaging ---
+dist/
+build/
+*.egg-info/
+
+# --- IDE / Editor Settings ---
+.vscode/
+.idea/
+*.swp
+
+# --- OS Generated Files ---
+.DS_Store
+Thumbs.db
+
+# =========================
+# TWA Project Specifics
+# =========================
+
+# --- Data Directories ---
+# 生データは容量が大きくなる可能性があるため除外
+# (ただし、フォルダ自体はGit管理したい場合、フォルダ内に .gitkeep を置いてください)
+data_raw/*.txt
+data_raw/*.csv
+
+# 解析済みデータ（JSON）や集約結果（CSV）は生成物なので除外
+# 必要な場合はコメントアウトを外してください
+data_analyzed/*.json
+data_analyzed/*.csv
+
+# --- Plots / Images ---
+# 生成されたグラフ画像など
+*.png
+*.jpg
+*.pdf
+
+# --- Logs ---
+*.log
