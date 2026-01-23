@@ -75,10 +75,17 @@ class AppConfigClass:
     INPUT_DIR: str = paths.INPUT_DIR
     OUTPUT_DIR: str = paths.OUTPUT_DIR
     
+    # Column names
     COL_FREQ_SQRT: str = columns.SQRT_FREQUENCY
     COL_AMP: str = columns.AMPLITUDE
     COL_PHASE: str = columns.PHASE
-
-    DEFAULT_THICKNESS_UM: float = 50.0  # デフォルトの試料厚
+    
+    # --- Metadata Keys ---
+    KEY_X_POS: str = columns.X_POS
+    KEY_Y_POS: str = columns.Y_POS
+    KEY_Z_POS: str = columns.Z_POS
+    
+    # UI defaults
+    DEFAULT_THICKNESS_UM: float = 50.0
 
 AppConfig = AppConfigClass()
