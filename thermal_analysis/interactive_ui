@@ -1,0 +1,169 @@
+import matplotlib.pyplot as plt
+from matplotlib.widgets import SpanSelector, Button
+import numpy as np
+from .datamodels import RawData, AnalysisResult
+from . import fitting, physics
+
+class TWAInteractivePlotter:
+    def __init__(self, raw_data: RawData, config):
+        self.raw = raw_data
+        self.config = config
+        self.result = None 
+
+        # --- データ準備 ---
+        self.freq_sqrt = raw_data.df[config.COL_FREQ_SQRT].values
+        self.amp = raw_data.df[config.COL_AMP].values
+        
+        # 解析用X, Y
+        self.x_data = self.freq_sqrt
+        self.y_data = np.log(self.amp)
+        self.thickness = raw_data.metadata.get("試料厚", config.DEFAULT_THICKNESS_UM)
+
+        # --- 状態管理用マスク ---
+        self.n_points = len(self.x_data)
+        self.manual_mask = np.ones(self.n_points, dtype=bool) # True=有効, False=手動除外
+        self.range_mask = np.ones(self.n_points, dtype=bool)  # True=範囲内
+        
+        # --- プロット初期化 ---
+        self.fig, self.ax = plt.subplots(figsize=(10, 7))
+        self.setup_plot()
+        
+        # --- インタラクション設定 ---
+        # 1. 範囲選択 (SpanSelector)
+        self.span = SpanSelector(
+            self.ax, self.on_range_select, 'horizontal', useblit=True,
+            props=dict(alpha=0.2, facecolor='green'),
+            interactive=True, drag_from_anywhere=True
+        )
+        
+        # 2. 点のクリック除外 (PickEvent)
+        self.fig.canvas.mpl_connect('pick_event', self.on_point_pick)
+        
+        # 3. Saveボタン
+        ax_save = plt.axes([0.8, 0.02, 0.1, 0.05])
+        self.btn_save = Button(ax_save, 'Save JSON')
+        self.btn_save.on_clicked(self.save_result)
+
+        # 初回計算
+        self.update_plot_and_calc()
+        plt.show()
+
+    def setup_plot(self):
+        """グラフの基本設定"""
+        self.ax.set_xlabel(r'$\sqrt{f}$ [Hz$^{0.5}$]')
+        self.ax.set_ylabel(r'$\ln(Amplitude)$')
+        self.ax.grid(True, which='both', linestyle='--')
+        self.ax.set_title("Drag to select range. Click points to exclude/include.")
+        
+        # 3種類の状態を描画するために、3つのScatterオブジェクトを用意しても良いが、
+        # ここでは1つのScatterの色とマーカーを動的に変えるアプローチをとるか、
+        # あるいは「有効な点」と「無効な点」を別々に描画します。
+        
+        # A. 全データ（薄く表示、クリック判定用）
+        # picker=5 は「マウスが5ピクセル以内に入ったら検知」という意味
+        self.scat_all = self.ax.scatter(
+            self.x_data, self.y_data, s=50, c='lightgray', 
+            edgecolors='none', picker=True, pickradius=5, zorder=1
+        )
+        
+        # B. 有効な点（解析に使われる点）
+        self.scat_valid = self.ax.scatter([], [], s=50, c='blue', marker='o', zorder=2, label='Used')
+        
+        # C. 手動で除外された点（視覚確認用）
+        self.scat_excluded = self.ax.scatter([], [], s=50, c='red', marker='x', zorder=2, label='Excluded')
+
+        # D. 近似直線
+        self.line_fit, = self.ax.plot([], [], 'r-', lw=2, label='Fit', zorder=3)
+        
+        self.ax.legend(loc='upper right')
+
+    def get_active_mask(self):
+        """現在の有効な点のマスク（範囲内 かつ 手動除外されていない）"""
+        return self.range_mask & self.manual_mask
+
+    def on_range_select(self, xmin, xmax):
+        """範囲選択時のコールバック"""
+        # 範囲マスクを更新
+        self.range_mask = (self.x_data >= xmin) & (self.x_data <= xmax)
+        self.update_plot_and_calc()
+
+    def on_point_pick(self, event):
+        """点をクリックした時のコールバック"""
+        if event.artist != self.scat_all:
+            return
+            
+        # クリックされた点のインデックス（複数重なっている場合はリストで来る）
+        ind = event.ind
+        
+        # トグル処理（有効なら無効へ、無効なら有効へ）
+        # 複数点クリックされた場合は、代表して最初の点に合わせて反転させるなどの挙動にする
+        # ここでは「クリックされた点すべてを反転」します
+        self.manual_mask[ind] = ~self.manual_mask[ind]
+        
+        self.update_plot_and_calc()
+
+    def update_plot_and_calc(self):
+        """表示の更新と再計算"""
+        active_mask = self.get_active_mask()
+        active_indices = np.where(active_mask)[0]
+
+        # 1. グラフの見た目を更新
+        # 有効な点
+        self.scat_valid.set_offsets(np.c_[self.x_data[active_mask], self.y_data[active_mask]])
+        
+        # 手動除外された点（範囲内だけど除外されているもの）を表示してあげると親切
+        excluded_in_range = self.range_mask & (~self.manual_mask)
+        self.scat_excluded.set_offsets(np.c_[self.x_data[excluded_in_range], self.y_data[excluded_in_range]])
+        
+        # 2. 計算 (Fitting)
+        if len(active_indices) < 2:
+            self.ax.set_title("Select at least 2 points")
+            self.line_fit.set_data([], [])
+            self.fig.canvas.draw_idle()
+            return
+
+        fit_res = fitting.linear_regression_subset(self.x_data, self.y_data, list(active_indices))
+        
+        # 3. 物理計算 (Physics)
+        alpha = physics.calculate_alpha_from_slope(fit_res.slope, self.thickness)
+        
+        # kd計算
+        freq_hz = self.x_data[active_indices] ** 2
+        kd_values = physics.calculate_kd(freq_hz, alpha, self.thickness)
+        kd_min, kd_max = (np.min(kd_values), np.max(kd_values)) if len(kd_values) > 0 else (0,0)
+
+        # 4. 近似直線の描画
+        # 選択範囲の端から端まで線を引く
+        x_active = self.x_data[active_indices]
+        x_min_draw, x_max_draw = np.min(x_active), np.max(x_active)
+        x_draw = np.linspace(x_min_draw, x_max_draw, 10)
+        y_draw = fit_res.slope * x_draw + fit_res.intercept
+        self.line_fit.set_data(x_draw, y_draw)
+        
+        # タイトル更新
+        title_text = (
+            f"Alpha: {alpha:.3e} | R2: {fit_res.r2:.4f}\n"
+            f"kd: {kd_min:.2f} - {kd_max:.2f} (N={len(active_indices)})"
+        )
+        self.ax.set_title(title_text)
+        self.fig.canvas.draw_idle()
+
+        # 結果オブジェクトの更新
+        self.result = AnalysisResult(
+            filename=self.raw.filepath,
+            thickness_um=self.thickness,
+            alpha_amp=alpha,
+            r2_amp=fit_res.r2,
+            slope_amp=fit_res.slope,
+            intercept_amp=fit_res.intercept,
+            used_indices=active_indices.tolist(), # 保存されるのは最終的に使ったインデックスのみ
+            freq_range_min=float(x_min_draw),
+            freq_range_max=float(x_max_draw),
+            kd_min=float(kd_min),
+            kd_max=float(kd_max)
+        )
+
+    def save_result(self, event):
+        if self.result:
+            self.result.save_to_json(self.config.OUTPUT_DIR)
+            print("保存完了")
