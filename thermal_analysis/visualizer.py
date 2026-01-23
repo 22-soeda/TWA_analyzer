@@ -1,70 +1,175 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+import matplotlib.ticker as ticker
+from typing import Optional, List
 from .datamodels import RawData, AnalysisResult
 
-def plot_diagnostic(raw: RawData, res: AnalysisResult, config, save_path=None):
+def _set_smart_limits(ax, x_data, y_data, margin=0.1):
     """
-    1データの詳細解析図（ボード線図 + フィッティング）を描画
+    データ範囲に基づいて、グリッド線がちょうど上限下限に来るように設定するヘルパー関数
     """
-    df = raw.df
-    x = df[config.COL_FREQ].values # sqrt(f)
-    y_amp = np.log(df[config.COL_AMP].values) # ln(A)
-    y_phase = df[config.COL_PHASE].values # Phase
-    
-    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
-    fig.suptitle(f"Analysis: {raw.filepath}", fontsize=14)
-    
-    # 左上: 振幅 生データとフィッティング
-    axes[0,0].scatter(x, y_amp, s=10, label='Data')
-    axes[0,0].plot(x, res.slope_amp * x + (y_amp[0] - res.slope_amp*x[0]), 'r-', label=f'Fit (R2={res.r2_amp:.4f})')
-    axes[0,0].set_title(f"Amplitude Fitting (alpha={res.alpha_amp:.2e})")
-    axes[0,0].set_ylabel("ln(Amplitude)")
-    axes[0,0].grid(True)
-    
-    # 左下: 位相 生データとフィッティング
-    axes[1,0].scatter(x, y_phase, s=10, color='orange', label='Data')
-    axes[1,0].plot(x, res.slope_phase * x + (y_phase[0] - res.slope_phase*x[0]), 'r-', label=f'Fit (R2={res.r2_phase:.4f})')
-    axes[1,0].set_title(f"Phase Fitting (alpha={res.alpha_phase:.2e})")
-    axes[1,0].set_xlabel("sqrt(Frequency)")
-    axes[1,0].set_ylabel("Phase [rad]")
-    axes[1,0].grid(True)
+    if len(x_data) == 0 or len(y_data) == 0:
+        return
 
-    # 右側: テキスト情報
-    axes[0,1].axis('off')
-    axes[1,1].axis('off')
-    info_text = (
-        f"Filename: {res.filename}\n"
-        f"Thickness: {raw.metadata.get('試料厚', 'N/A')} um\n"
-        f"Alpha (Amp): {res.alpha_amp:.3e} m2/s\n"
-        f"Alpha (Phase): {res.alpha_phase:.3e} m2/s\n"
+    def get_nice_ticks(data_min, data_max, margin_ratio):
+        span = data_max - data_min
+        if span == 0:
+            span = 1.0
+        
+        target_min = data_min - span * margin_ratio
+        target_max = data_max + span * margin_ratio
+        
+        locator = ticker.MaxNLocator(nbins='auto', steps=[1, 2, 2.5, 5, 10])
+        ticks = locator.tick_values(target_min, target_max)
+        
+        if len(ticks) > 1:
+            step = ticks[1] - ticks[0]
+        else:
+            step = span * 0.1 if span > 0 else 0.1
+
+        while len(ticks) > 0 and ticks[0] > data_min:
+            ticks = np.insert(ticks, 0, ticks[0] - step)
+        while len(ticks) > 0 and ticks[-1] < data_max:
+            ticks = np.append(ticks, ticks[-1] + step)
+            
+        return ticks
+
+    # X軸設定
+    x_min, x_max = np.min(x_data), np.max(x_data)
+    x_ticks = get_nice_ticks(x_min, x_max, margin)
+    if len(x_ticks) >= 2:
+        ax.set_xlim(x_ticks[0], x_ticks[-1])
+        ax.set_xticks(x_ticks)
+
+    # Y軸設定
+    y_min, y_max = np.min(y_data), np.max(y_data)
+    y_ticks = get_nice_ticks(y_min, y_max, margin)
+    if len(y_ticks) >= 2:
+        ax.set_ylim(y_ticks[0], y_ticks[-1])
+        ax.set_yticks(y_ticks)
+
+def _generic_plot_and_save(
+    x_all: np.ndarray,
+    y_all: np.ndarray,
+    output_path: str,
+    xlabel: str,
+    ylabel: str,
+    title: str,
+    used_indices: Optional[List[int]] = None,
+    slope: Optional[float] = None,
+    intercept: Optional[float] = None,
+    data_label_valid: str = "Used Data",
+    color_valid: str = "blue"
+):
+    """
+    【汎用プロッター】
+    プロットデータ、使用した点の情報、ラベル等を受け取り、グラフを描画・保存する。
+    Used Dataや近似直線の情報が無い場合は、自動的にそれらを省略して描画する。
+    """
+    fig, ax = plt.subplots(figsize=(10, 7))
+    
+    # 1. 全データプロット (背景として薄く表示)
+    # マーカー形状は共通で統一 (例えば丸など)
+    ax.scatter(x_all, y_all, s=40, c='lightgray', marker='o', edgecolors='gray', label='All Data', zorder=1)
+    
+    # 軸調整用のデータ範囲（デフォルトは全データ）
+    x_for_limits = x_all
+    y_for_limits = y_all
+
+    # 2. Used Data & Fit Line (情報がある場合のみ描画)
+    if used_indices is not None and len(used_indices) > 0:
+        x_valid = x_all[used_indices]
+        y_valid = y_all[used_indices]
+        
+        # Used Dataプロット
+        ax.scatter(x_valid, y_valid, s=40, c=color_valid, marker='o', label=data_label_valid, zorder=2)
+        
+        # 近似直線 (slope/interceptがあり、かつ点が2つ以上ある場合)
+        if slope is not None and intercept is not None and len(x_valid) >= 2:
+            x_line = np.linspace(np.min(x_valid), np.max(x_valid), 10)
+            y_line = slope * x_line + intercept
+            ax.plot(x_line, y_line, color='red', lw=2, label='Fit', zorder=3)
+        
+        # スマートな軸調整は「Used Data」を基準にする
+        x_for_limits = x_valid
+        y_for_limits = y_valid
+
+    # 3. 軸・タイトル・グリッド設定
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.set_title(title, fontsize=14)
+    ax.grid(True, which='major', linestyle='--', alpha=0.7)
+    ax.legend(loc='upper right')
+
+    # 4. 範囲調整 (キリの良いメモリ設定)
+    _set_smart_limits(ax, x_for_limits, y_for_limits)
+
+    # 5. 保存処理
+    output_dir = os.path.dirname(output_path)
+    if output_dir and not os.path.exists(output_dir):
+        os.makedirs(output_dir, exist_ok=True)
+        
+    plt.savefig(output_path, dpi=100, bbox_inches='tight')
+    plt.close(fig)
+    print(f"Saved Plot: {output_path}")
+
+
+# ---------------------------------------------------------
+# 以下、ラッパー関数 (外部から呼び出されるAPI)
+# ---------------------------------------------------------
+
+def save_phase_plot(raw_data: RawData, result: AnalysisResult, config, output_dir: str):
+    """
+    位相プロット用のラッパー
+    """
+    # 1. データの準備
+    x_all = raw_data.df[config.COL_FREQ_SQRT].values
+    y_all = raw_data.df[config.COL_PHASE].values
+    
+    # 2. ラベル・ファイル名の定義
+    title = f"alpha = {result.alpha_phase:.2e} m$^2$/s , kd : {result.kd_min:.2f} - {result.kd_max:.2f}"
+    save_path = os.path.join(output_dir, "phase_plot.png")
+
+    # 3. 汎用プロッターへ委譲
+    _generic_plot_and_save(
+        x_all=x_all,
+        y_all=y_all,
+        output_path=save_path,
+        xlabel=r'$\sqrt{f}$ [Hz$^{0.5}$]',
+        ylabel=r'Phase [rad]',
+        title=title,
+        used_indices=result.used_indices,      # 使用した点
+        slope=result.slope_phase,              # 近似直線の傾き
+        intercept=result.intercept_phase,      # 近似直線の切片
+        data_label_valid="Used Data",
+        color_valid="orange"
     )
-    axes[0,1].text(0.1, 0.5, info_text, fontsize=12)
-    
-    plt.tight_layout()
-    if save_path:
-        plt.savefig(save_path)
-        plt.close()
-    else:
-        plt.show()
 
-def plot_spatial_distribution(results: list[AnalysisResult]):
+def save_amplitude_plot(raw_data: RawData, result: AnalysisResult, config, output_dir: str):
     """
-    複数の解析結果から、位置 vs 熱拡散率のプロットを作成
+    振幅プロット用のラッパー
     """
-    # x位置でソート
-    results.sort(key=lambda r: r.x_position if r.x_position else 0)
+    # 1. データの準備 (振幅は対数変換)
+    x_all = raw_data.df[config.COL_FREQ_SQRT].values
+    y_all = np.log(raw_data.df[config.COL_AMP].values)
     
-    xs = [r.x_position for r in results]
-    alphas_amp = [r.alpha_amp for r in results]
-    alphas_phase = [r.alpha_phase for r in results]
-    
-    plt.figure(figsize=(10, 6))
-    plt.plot(xs, alphas_amp, 'o-', label='Alpha (Amp)')
-    plt.plot(xs, alphas_phase, 's-', label='Alpha (Phase)')
-    
-    plt.xlabel('Position (x)')
-    plt.ylabel('Thermal Diffusivity [m^2/s]')
-    plt.title('Spatial Distribution of Thermal Diffusivity')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+    # 2. ラベル・ファイル名の定義
+    # ラベルには振幅由来のAlphaを表示
+    title = f"alpha = {result.alpha_amp:.2e} m$^2$/s , kd : {result.kd_min:.2f} - {result.kd_max:.2f}"
+    save_path = os.path.join(output_dir, "amplitude_plot.png")
+
+    # 3. 汎用プロッターへ委譲
+    _generic_plot_and_save(
+        x_all=x_all,
+        y_all=y_all,
+        output_path=save_path,
+        xlabel=r'$\sqrt{f}$ [Hz$^{0.5}$]',
+        ylabel=r'$\ln(Amplitude)$',
+        title=title,
+        used_indices=result.used_indices,      # 使用した点
+        slope=result.slope_amp,                # 近似直線の傾き
+        intercept=result.intercept_amp,        # 近似直線の切片
+        data_label_valid="Used Data",
+        color_valid="blue"
+    )

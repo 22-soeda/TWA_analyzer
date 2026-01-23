@@ -12,6 +12,35 @@ class RawData:
     metadata: Dict[str, float]
     filepath: str
 
+    def save_input_data(self, output_dir: str):
+        """
+        RawDataを再利用可能なJSON形式で保存
+        input_data.json として保存します
+        """
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir, exist_ok=True)
+
+        # DataFrameをJSONシリアライズ可能な辞書形式(split)に変換
+        # split形式: {'index': [...], 'columns': [...], 'data': [[...], ...]}
+        df_dict = self.df.to_dict(orient='split')
+        
+        save_data = {
+            "metadata": self.metadata,
+            "filepath": self.filepath,
+            "dataframe": df_dict
+        }
+
+        save_path = os.path.join(output_dir, "input_data.json")
+        
+        def default_converter(o):
+            if isinstance(o, (np.int64, np.int32)): return int(o)
+            if isinstance(o, (np.float64, np.float32)): return float(o)
+            return str(o)
+
+        with open(save_path, 'w', encoding='utf-8') as f:
+            json.dump(save_data, f, indent=4, ensure_ascii=False, default=default_converter)
+        print(f"Saved Input Data: {save_path}")
+
 @dataclass
 class AnalysisResult:
     """解析結果を保持するクラス"""
@@ -20,16 +49,27 @@ class AnalysisResult:
 
     thickness_um: Optional[float] = None  # 試料厚 (um単位)
 
-    alpha_amp: Optional[float] = None  # 振幅から求めた熱拡散率 (m^2/s)
-    alpha_phase: Optional[float] = None  # 位相から求めた熱拡散率 (m^2/s)
-    r2_amp: Optional[float] = None       # 振幅フィッティングの決定係数
-    r2_phase: Optional[float] = None     # 位相フィッティングの決定係数
+    # --- Phase results ---
+    alpha_phase: Optional[float] = None
+    r2_phase: Optional[float] = None
+    slope_phase: Optional[float] = None
+    intercept_phase: Optional[float] = None
 
+    # --- Amplitude results ---
+    alpha_amp: Optional[float] = None
+    r2_amp: Optional[float] = None
+    slope_amp: Optional[float] = None
+    intercept_amp: Optional[float] = None
+
+    alpha_ratio: Optional[float] = None
+
+    #--- Position ---
     x_position: Optional[float] = None
     y_position: Optional[float] = None
     z_position: Optional[float] = None
 
-    # 解析に使用した範囲情報
+
+    #--- analysis range ---
     used_indices: List[int] = field(default_factory=list)
     freq_range_min: float = 0.0
     freq_range_max: float = 0.0
@@ -44,13 +84,10 @@ class AnalysisResult:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
             
-        base_name = os.path.basename(self.filename).rsplit('.', 1)[0]
-        save_path = os.path.join(output_dir, f"{base_name}_result.json")
-        
-        # numpy型などをPython標準型に変換
+        save_path = os.path.join(output_dir, "results.json")
+
         data_dict = asdict(self)
-        
-        # JSONシリアライズ対応のヘルパー
+
         def default_converter(o):
             if isinstance(o, (np.int64, np.int32)): return int(o)
             if isinstance(o, (np.float64, np.float32)): return float(o)

@@ -12,6 +12,7 @@ class PathConfig:
 class ColumnConfig:
     """
     入力データの列名（ヘッダー）に関する設定
+    ※ データファイルのフォーマットに合わせて変更
     """
     TIME: str = "time"        
 
@@ -67,3 +68,17 @@ paths = PathConfig()
 columns = ColumnConfig()
 analysis = AnalysisConfig()
 plots = PlotConfig()
+
+@dataclass(frozen=True)
+class AppConfigClass:
+    """アプリケーション全体の設定を統合するクラス"""
+    INPUT_DIR: str = paths.INPUT_DIR
+    OUTPUT_DIR: str = paths.OUTPUT_DIR
+    
+    COL_FREQ_SQRT: str = columns.SQRT_FREQUENCY
+    COL_AMP: str = columns.AMPLITUDE
+    COL_PHASE: str = columns.PHASE
+
+    DEFAULT_THICKNESS_UM: float = 50.0  # デフォルトの試料厚
+
+AppConfig = AppConfigClass()
