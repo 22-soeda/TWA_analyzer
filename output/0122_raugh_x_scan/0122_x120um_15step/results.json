@@ -1,0 +1,31 @@
+{
+    "filename": "c:\\Users\\soeda\\TWA_analyzer\\data_raw\\0122_raugh_sensor\\x_scan\\0122_x120um_15step.txt",
+    "samplename": null,
+    "thickness_um": 50.0,
+    "alpha_phase": 5.92402698278271e-07,
+    "r2_phase": 0.9854319470209288,
+    "slope_phase": -0.11514270466946414,
+    "intercept_phase": -0.216336273670523,
+    "alpha_amp": 9.674600801304048e-08,
+    "r2_amp": 0.996071535924684,
+    "slope_amp": -0.2849235938975573,
+    "intercept_amp": -8.803995317458707,
+    "alpha_ratio": 0.16331122105658558,
+    "x_position": -120.0,
+    "y_position": null,
+    "z_position": null,
+    "used_indices": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+    ],
+    "freq_range_min": 9.29473761,
+    "freq_range_max": 19.4941171,
+    "kd_min": 1.0702212276083911,
+    "kd_max": 2.2446053680372504
+}

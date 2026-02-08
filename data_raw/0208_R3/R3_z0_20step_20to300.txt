@@ -1,0 +1,2 @@
+R3_z0_20step_20to300_sqrt_TW_freq 	 R3_z0_20step_20to300_amp 	 R3_z0_20step_20to300_amp_sigma 	 R3_z0_20step_20to300_theta 	 R3_z0_20step_20to300_theta_sigma 	 R3_z0_20step_20to300_DCV 	 R3_z0_20step_20to300_DCV_sigma 	 R3_z0_20step_20to300_decay_ratio 
+4.47213595E+0	2.12957711E-6	6.73704073E-8	7.25279310E-1	7.22539031E-2	0.00000000E+0	0.00000000E+0	-1.15617210E+1

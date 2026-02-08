@@ -1,0 +1,29 @@
+{
+    "filename": "c:\\Users\\soeda\\TWA_analyzer\\data_raw\\0122_raugh_sensor\\z_scan\\0122_z2um_10step.txt",
+    "samplename": null,
+    "thickness_um": 50.0,
+    "alpha_phase": 7.361576995286043e-07,
+    "r2_phase": 0.9855993758456798,
+    "slope_phase": -0.10329029345813234,
+    "intercept_phase": -0.02361743979294051,
+    "alpha_amp": 1.3537280960567612e-07,
+    "r2_amp": 0.9951367777589434,
+    "slope_amp": -0.2408680625658901,
+    "intercept_amp": -9.49322338763181,
+    "alpha_ratio": 0.1838910462966856,
+    "x_position": null,
+    "y_position": null,
+    "z_position": 8.0,
+    "used_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+    ],
+    "freq_range_min": 11.2837917,
+    "freq_range_max": 20.6439369,
+    "kd_min": 1.165506156013438,
+    "kd_max": 2.132318300532167
+}
