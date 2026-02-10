@@ -75,8 +75,12 @@ def adjust_phase_continuity(df: pd.DataFrame, col_name: str) -> pd.DataFrame:
 
 def load_from_text(filepath: str, sep: str = '\t') -> RawData:
 
-    with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
-        lines = f.readlines()
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+    except UnicodeDecodeError:
+        with open(filepath, 'r', encoding='cp932') as f:
+            lines = f.readlines()
 
     # "sample information" 行を探して区切り位置を特定
     separator_idx = -1

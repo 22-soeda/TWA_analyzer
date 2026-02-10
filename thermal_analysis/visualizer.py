@@ -150,9 +150,10 @@ def save_amplitude_plot(raw_data: RawData, result: AnalysisResult, config, outpu
     """
     振幅プロット用のラッパー
     """
-    # 1. データの準備 (振幅は対数変換)
+    # 1. データの準備 (振幅は対数変換: ln(Amp * sqrt(f)))
     x_all = raw_data.df[config.COL_FREQ_SQRT].values
-    y_all = np.log(raw_data.df[config.COL_AMP].values)
+    # 【修正】Ampだけでなく、sqrt(f)を掛けてから対数を取る
+    y_all = np.log(raw_data.df[config.COL_AMP].values * x_all)
     
     # 2. ラベル・ファイル名の定義
     # ラベルには振幅由来のAlphaを表示
@@ -165,7 +166,7 @@ def save_amplitude_plot(raw_data: RawData, result: AnalysisResult, config, outpu
         y_all=y_all,
         output_path=save_path,
         xlabel=r'$\sqrt{f}$ [Hz$^{0.5}$]',
-        ylabel=r'$\ln(Amplitude)$',
+        ylabel=r'$\ln(Amplitude \cdot \sqrt{f})$', # 【修正】ラベル変更
         title=title,
         used_indices=result.used_indices,      # 使用した点
         slope=result.slope_amp,                # 近似直線の傾き

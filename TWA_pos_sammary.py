@@ -9,7 +9,7 @@ import numpy as np
 # ==========================================
 # Configuration
 # ==========================================
-TARGET_AXIS = "x_position"
+TARGET_AXIS = "z_position"
 AXIS_LABELS = {
     "x_position": "X Position [um]",
     "y_position": "Y Position [um]",

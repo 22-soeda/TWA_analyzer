@@ -1,0 +1,32 @@
+{
+    "filename": "d:\\0209\\step_zm2_R3.txt",
+    "samplename": null,
+    "thickness_um": 26.5,
+    "alpha_phase": 1.252464954740578e-07,
+    "r2_phase": 0.9976835138849622,
+    "slope_phase": -0.13272050299150653,
+    "intercept_phase": -2.2656530909823793,
+    "alpha_amp": 1.1968131615303006e-07,
+    "r2_amp": 0.9972679305170482,
+    "slope_amp": -0.13577119234809115,
+    "intercept_amp": -6.865699946169024,
+    "alpha_ratio": 0.9555661873015805,
+    "x_position": null,
+    "y_position": null,
+    "z_position": -2.0,
+    "used_indices": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+    ],
+    "freq_range_min": 7.63055945,
+    "freq_range_max": 17.262773,
+    "kd_min": 1.0127316883105932,
+    "kd_max": 2.291123915588198
+}

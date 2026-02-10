@@ -14,7 +14,8 @@ def run_analysis(raw_data: RawData, config, used_indices: Optional[List[int]] = 
     x_data = raw_data.df[config.COL_FREQ_SQRT].values
     amp_data = raw_data.df[config.COL_AMP].values
     phase_data = raw_data.df[config.COL_PHASE].values
-    y_amp_log = np.log(amp_data)
+    
+    y_amp_log = np.log(amp_data * x_data)
     
     thickness = raw_data.metadata.get("試料厚", config.DEFAULT_THICKNESS_UM)
 
