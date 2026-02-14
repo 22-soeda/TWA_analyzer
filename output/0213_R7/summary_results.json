@@ -1,0 +1,32 @@
+[
+    {
+        "id":"step_zm1_R7",
+        "z_position":-1.0,
+        "alpha_phase":0.0000001104,
+        "alpha_ratio":0.9974030361
+    },
+    {
+        "id":"step_z0_R7",
+        "z_position":0.0,
+        "alpha_phase":0.0000001041,
+        "alpha_ratio":0.9054622614
+    },
+    {
+        "id":"step_z1_R7",
+        "z_position":1.0,
+        "alpha_phase":0.0000000904,
+        "alpha_ratio":0.9615526072
+    },
+    {
+        "id":"step_z2_R7",
+        "z_position":2.0,
+        "alpha_phase":0.0000000797,
+        "alpha_ratio":0.834035715
+    },
+    {
+        "id":"step_z3_R7",
+        "z_position":3.0,
+        "alpha_phase":0.0000000632,
+        "alpha_ratio":0.979522289
+    }
+]

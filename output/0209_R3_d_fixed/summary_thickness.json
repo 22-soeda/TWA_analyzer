@@ -1,0 +1,37 @@
+[
+    {
+        "id":"step_zm3_R3",
+        "z_position":-3.0,
+        "thickness_um":26.0688
+    },
+    {
+        "id":"step_zm2_R3",
+        "z_position":-2.0,
+        "thickness_um":26.1951
+    },
+    {
+        "id":"step_zm1_R3",
+        "z_position":-1.0,
+        "thickness_um":26.2481
+    },
+    {
+        "id":"step_z0_R3",
+        "z_position":0.0,
+        "thickness_um":26.3691
+    },
+    {
+        "id":"step_z1_R3",
+        "z_position":1.0,
+        "thickness_um":26.6
+    },
+    {
+        "id":"step_z2_R3",
+        "z_position":2.0,
+        "thickness_um":27.6
+    },
+    {
+        "id":"step_z3_R3",
+        "z_position":3.0,
+        "thickness_um":28.6
+    }
+]

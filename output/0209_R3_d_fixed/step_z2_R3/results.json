@@ -1,12 +1,12 @@
 {
     "filename": "d:\\0209_fix_d\\step_z2_R3.txt",
     "samplename": null,
-    "thickness_um": 50.0,
-    "alpha_phase": 3.3012503693841404e-07,
+    "thickness_um": 27.6,
+    "alpha_phase": 1.0059041925528252e-07,
     "r2_phase": 0.9948432599814264,
     "slope_phase": -0.1542430872566187,
     "intercept_phase": 3.9440282164916782,
-    "alpha_amp": 3.1093356023156355e-07,
+    "alpha_amp": 9.474269953679835e-08,
     "r2_amp": 0.9922585486408428,
     "slope_amp": -0.1589319239872177,
     "intercept_amp": -7.000350602419694,
@@ -26,6 +26,6 @@
     ],
     "freq_range_min": 7.63055945,
     "freq_range_max": 16.0981973,
-    "kd_min": 1.1769610470631662,
-    "kd_max": 2.483035650818163
+    "kd_min": 1.1769610470631664,
+    "kd_max": 2.4830356508181635
 }

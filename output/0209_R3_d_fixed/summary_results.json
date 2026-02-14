@@ -2,43 +2,43 @@
     {
         "id":"step_zm3_R3",
         "z_position":-3.0,
-        "alpha_phase":0.0000004261,
-        "alpha_ratio":0.9971909686
+        "alpha_phase":0.0000001158,
+        "alpha_ratio":0.9977143179
     },
     {
         "id":"step_zm2_R3",
         "z_position":-2.0,
-        "alpha_phase":0.0000004646,
-        "alpha_ratio":0.9335791101
+        "alpha_phase":0.0000001224,
+        "alpha_ratio":0.9555661873
     },
     {
         "id":"step_zm1_R3",
         "z_position":-1.0,
-        "alpha_phase":0.0000004213,
+        "alpha_phase":0.0000001161,
         "alpha_ratio":0.9740282935
     },
     {
         "id":"step_z0_R3",
         "z_position":0.0,
-        "alpha_phase":0.0000004062,
+        "alpha_phase":0.000000113,
         "alpha_ratio":0.9971271591
     },
     {
         "id":"step_z1_R3",
         "z_position":1.0,
-        "alpha_phase":0.000000367,
-        "alpha_ratio":0.9669660483
+        "alpha_phase":0.0000001026,
+        "alpha_ratio":0.9623690424
     },
     {
         "id":"step_z2_R3",
         "z_position":2.0,
-        "alpha_phase":0.0000003301,
+        "alpha_phase":0.0000001006,
         "alpha_ratio":0.9418660369
     },
     {
         "id":"step_z3_R3",
         "z_position":3.0,
-        "alpha_phase":0.0000002784,
-        "alpha_ratio":0.8942960654
+        "alpha_phase":0.0000000942,
+        "alpha_ratio":0.8610002298
     }
 ]

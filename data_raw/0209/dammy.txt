@@ -1,0 +1,1 @@
+dammy_sqrt_TW_freq 	 dammy_amp 	 dammy_amp_sigma 	 dammy_theta 	 dammy_theta_sigma 	 dammy_DCV 	 dammy_DCV_sigma 	 dammy_decay_ratio 

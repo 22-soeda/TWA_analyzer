@@ -1,0 +1,33 @@
+{
+    "filename": "c:\\Users\\soeda\\TWA_analyzer\\data_raw\\0212\\step_zm5_R15.txt",
+    "samplename": null,
+    "thickness_um": 26.5,
+    "alpha_phase": 9.48571329214883e-08,
+    "r2_phase": 0.9390593635175806,
+    "slope_phase": -0.15250560776014546,
+    "intercept_phase": 0.9555703604456538,
+    "alpha_amp": 9.690661060343442e-08,
+    "r2_amp": 0.8724629400682707,
+    "slope_amp": -0.15088431942384922,
+    "intercept_amp": -8.207358027832466,
+    "alpha_ratio": 0.9788510023291075,
+    "x_position": null,
+    "y_position": null,
+    "z_position": -5.0,
+    "used_indices": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+    ],
+    "freq_range_min": 7.41648866,
+    "freq_range_max": 11.793762,
+    "kd_min": 1.1310561105395267,
+    "kd_max": 1.7986148415885084
+}

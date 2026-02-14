@@ -15,40 +15,104 @@ AXIS_LABELS = {
     "y_position": "Y Position [um]",
     "z_position": "Z Position [um]"
 }
+
+# グラフ描画設定
+PLOT_SETTINGS = {
+    "fig_size": (8, 9),      # 画像全体のサイズ (縦長に変更: 8x6 -> 8x9)
+                             # 枠が正方形(aspect=1)の場合、縦に2つ並べるなら縦長のキャンバスが推奨されます
+    "font_size_label": 16,   # 軸ラベルのフォントサイズ
+    "font_size_tick": 18,    # 目盛りのフォントサイズ
+    "box_aspect": 0.6,       # グラフ枠の縦横比 (1.0 = 正方形)
+    "marker_size": 8,        # プロットの点のサイズ
+    "show_grid": False,      # グリッドの表示有無
+    "hspace": 0.1,           # ★上下グラフの隙間 (0に近いほど狭い)
+    
+    # 軸目盛りの表示形式設定
+    "use_scientific_notation": True,
+    "scilimits": (-3, 3),
+    
+    # 目盛りの密度（刻み幅）
+    "x_tick_step": None,
+    "y_tick_step": None
+}
 # ==========================================
 
-def _set_smart_limits(ax, x_data, y_data, margin=0.1):
+def _apply_axis_settings(ax, x_data, y_data, is_ratio=False):
     if len(x_data) == 0 or len(y_data) == 0:
         return
 
-    def get_nice_ticks(data_min, data_max, margin_ratio):
-        span = data_max - data_min
+    # --- 1. X軸の設定 ---
+    x_min, x_max = np.min(x_data), np.max(x_data)
+    if PLOT_SETTINGS["x_tick_step"] is not None:
+        step = PLOT_SETTINGS["x_tick_step"]
+        margin = (x_max - x_min) * 0.1 if x_max != x_min else step
+        ax.set_xlim(x_min - margin, x_max + margin)
+        ax.xaxis.set_major_locator(ticker.MultipleLocator(step))
+    else:
+        margin = 0.1
+        span = x_max - x_min
         if span == 0: span = 1.0
-        target_min = data_min - span * margin_ratio
-        target_max = data_max + span * margin_ratio
+        target_min = x_min - span * margin
+        target_max = x_max + span * margin
         locator = ticker.MaxNLocator(nbins='auto', steps=[1, 2, 2.5, 5, 10])
         ticks = locator.tick_values(target_min, target_max)
-        if len(ticks) > 1:
-            step = ticks[1] - ticks[0]
-        else:
-            step = span * 0.1 if span > 0 else 0.1
-        while len(ticks) > 0 and ticks[0] > data_min:
-            ticks = np.insert(ticks, 0, ticks[0] - step)
-        while len(ticks) > 0 and ticks[-1] < data_max:
-            ticks = np.append(ticks, ticks[-1] + step)
-        return ticks
+        if len(ticks) >= 2:
+            ax.set_xlim(ticks[0], ticks[-1])
+            ax.set_xticks(ticks)
 
-    x_min, x_max = np.min(x_data), np.max(x_data)
-    x_ticks = get_nice_ticks(x_min, x_max, margin)
-    if len(x_ticks) >= 2:
-        ax.set_xlim(x_ticks[0], x_ticks[-1])
-        ax.set_xticks(x_ticks)
-
+    # --- 2. Y軸の設定 ---
     y_min, y_max = np.min(y_data), np.max(y_data)
-    y_ticks = get_nice_ticks(y_min, y_max, margin)
-    if len(y_ticks) >= 2:
-        ax.set_ylim(y_ticks[0], y_ticks[-1])
-        ax.set_yticks(y_ticks)
+    
+    current_y_max_limit = None
+    if is_ratio:
+        if y_max > 1.0:
+            current_y_max_limit = 1.0
+
+    if PLOT_SETTINGS["y_tick_step"] is not None:
+        step = PLOT_SETTINGS["y_tick_step"]
+        margin = (y_max - y_min) * 0.1 if y_max != y_min else step
+        lower = y_min - margin
+        upper = y_max + margin
+        if current_y_max_limit is not None: upper = min(upper, current_y_max_limit)
+        elif is_ratio and upper > 1.0: upper = 1.0
+        ax.set_ylim(lower, upper)
+        ax.yaxis.set_major_locator(ticker.MultipleLocator(step))
+    else:
+        margin = 0.1
+        span = y_max - y_min
+        if span == 0: span = 1.0 if not is_ratio else 0.1
+        target_min = y_min - span * margin
+        target_max = y_max + span * margin
+        if current_y_max_limit is not None: target_max = min(target_max, current_y_max_limit)
+        elif is_ratio and target_max > 1.0: target_max = 1.0
+        locator = ticker.MaxNLocator(nbins='auto', steps=[1, 2, 2.5, 5, 10])
+        ticks = locator.tick_values(target_min, target_max)
+        if is_ratio: ticks = [t for t in ticks if t <= 1.0000001]
+        
+        if len(ticks) >= 2:
+            ax.set_ylim(ticks[0], ticks[-1])
+            ax.set_yticks(ticks)
+        elif len(ticks) == 1:
+             ax.set_ylim(ticks[0]-span*margin, ticks[0]+span*margin)
+
+    # --- 3. 指数表記の設定 ---
+    if PLOT_SETTINGS["use_scientific_notation"]:
+        ax.xaxis.set_major_formatter(ticker.ScalarFormatter(useMathText=True))
+        ax.ticklabel_format(style='sci', axis='x', scilimits=PLOT_SETTINGS["scilimits"])
+        ax.yaxis.set_major_formatter(ticker.ScalarFormatter(useMathText=True))
+        ax.ticklabel_format(style='sci', axis='y', scilimits=PLOT_SETTINGS["scilimits"])
+
+def apply_plot_style(ax, xlabel=None, ylabel=None):
+    if xlabel:
+        ax.set_xlabel(xlabel, fontsize=PLOT_SETTINGS["font_size_label"])
+    if ylabel:
+        ax.set_ylabel(ylabel, fontsize=PLOT_SETTINGS["font_size_label"])
+    
+    ax.tick_params(axis='both', labelsize=PLOT_SETTINGS["font_size_tick"])
+    ax.grid(PLOT_SETTINGS["show_grid"])
+    
+    if PLOT_SETTINGS["box_aspect"] is not None:
+        ax.set_box_aspect(PLOT_SETTINGS["box_aspect"])
 
 def run_summary():
     print("==========================================")
@@ -104,41 +168,62 @@ def run_summary():
     df.to_json(summary_json_path, orient='records', indent=4)
     print(f"\nSaved Summary JSON: {summary_json_path}")
 
-    # --- プロット作成関数 (タイトル削除) ---
-    def save_plot(x, y, ylabel, filename, color):
+    # --- プロット作成関数 (単一グラフ) ---
+    def save_plot(x, y, ylabel, filename, color, is_ratio=False):
         if len(x) == 0: return
 
-        fig, ax = plt.subplots(figsize=(10, 6))
-        ax.plot(x, y, 'o-', color=color, markersize=8, linewidth=2)
-        
+        fig, ax = plt.subplots(figsize=PLOT_SETTINGS["fig_size"])
+        ax.plot(x, y, marker='o', linestyle='None', color=color, 
+                markersize=PLOT_SETTINGS["marker_size"])
         xlabel = AXIS_LABELS.get(TARGET_AXIS, f"{TARGET_AXIS} [um]")
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
-        # ax.set_title(title) <-- 削除
-        ax.grid(True, which='major', linestyle='--', alpha=0.7)
-
-        _set_smart_limits(ax, x.values, y.values)
+        apply_plot_style(ax, xlabel, ylabel)
+        _apply_axis_settings(ax, x.values, y.values, is_ratio=is_ratio)
         
         save_path = os.path.join(target_dir, filename)
+        # 単一プロットは tight_layout を使って問題ない
         plt.savefig(save_path, dpi=100, bbox_inches='tight')
         plt.close(fig)
         print(f"Saved Plot: {save_path}")
 
-    save_plot(
-        df[TARGET_AXIS], 
-        df["alpha_phase"], 
-        ylabel=r"Thermal Diffusivity [m$^2$/s]", 
-        filename="summary_pos_alpha.png",
-        color="orange"
-    )
+    # --- スタックプロット作成関数 ---
+    def save_stacked_plot(df, filename):
+        if len(df) == 0: return
+
+        # 縦に2つ並べる
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=PLOT_SETTINGS["fig_size"], sharex=True)
+        
+        # 上段
+        ax1.plot(df[TARGET_AXIS], df["alpha_phase"], marker='o', linestyle='None', 
+                 markersize=PLOT_SETTINGS["marker_size"], color='orange')
+        apply_plot_style(ax1, ylabel=r"Thermal Diffusivity [m$^2$/s]")
+        _apply_axis_settings(ax1, df[TARGET_AXIS].values, df["alpha_phase"].values, is_ratio=False)
+        
+        # 下段
+        ax2.plot(df[TARGET_AXIS], df["alpha_ratio"], marker='o', linestyle='None', 
+                 markersize=PLOT_SETTINGS["marker_size"], color='green')
+        xlabel = AXIS_LABELS.get(TARGET_AXIS, f"{TARGET_AXIS} [um]")
+        apply_plot_style(ax2, xlabel=xlabel, ylabel="Alpha Ratio")
+        _apply_axis_settings(ax2, df[TARGET_AXIS].values, df["alpha_ratio"].values, is_ratio=True)
+
+        # ★重要: tight_layout をやめて subplots_adjust で隙間(hspace)を直接指定する
+        # box_aspect固定時は tight_layout が隙間を広げすぎる原因になるため
+        plt.subplots_adjust(hspace=PLOT_SETTINGS["hspace"])
+        
+        save_path = os.path.join(target_dir, filename)
+        # bbox_inches='tight' で外側の余白だけを最後にカットする
+        plt.savefig(save_path, dpi=100, bbox_inches='tight')
+        plt.close(fig)
+        print(f"Saved Stacked Plot: {save_path}")
 
     save_plot(
-        df[TARGET_AXIS], 
-        df["alpha_ratio"], 
-        ylabel="Alpha Ratio", 
-        filename="summary_pos_ratio.png",
-        color="green"
+        df[TARGET_AXIS], df["alpha_phase"], ylabel=r"Thermal Diffusivity [m$^2$/s]", 
+        filename="summary_pos_alpha.png", color="orange", is_ratio=False
     )
+    save_plot(
+        df[TARGET_AXIS], df["alpha_ratio"], ylabel="Alpha Ratio", 
+        filename="summary_pos_ratio.png", color="green", is_ratio=True
+    )
+    save_stacked_plot(df, "summary_pos_stacked.png")
 
     print("\n=== 集計完了 ===")
 
