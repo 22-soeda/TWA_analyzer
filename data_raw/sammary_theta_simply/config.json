@@ -1,0 +1,30 @@
+{
+    "xlabel": "Z Position [um]",
+    "ylabel": "theta [deg]",
+    "plots": [
+        {
+            "legend": "R1.5",
+            "shift_z": 0,
+            "shift_y": -180,
+            "csv_file": "R1.5_theta.csv"
+        },
+        {
+            "legend": "R3",
+            "shift_z": 0,
+            "shift_y": -180,
+            "csv_file": "R3_theta.csv"
+        },
+        {
+            "legend": "R7",
+            "shift_z": -0,
+            "shift_y": -180,
+            "csv_file": "R7_theta.csv"
+        },
+        {
+            "legend": "R15",
+            "shift_z": -0,
+            "shift_y": 0,
+            "csv_file": "R15_theta.csv"
+        }
+    ]
+}

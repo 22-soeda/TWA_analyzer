@@ -1,0 +1,30 @@
+{
+    "xlabel": "Z Position [um]",
+    "ylabel": "Amp Ratio",
+    "plots": [
+        {
+            "legend": "R1.5",
+            "shift_z": 0,
+            "shift_y": -0,
+            "csv_file": "R1.5_amp_ratio.csv"
+        },
+        {
+            "legend": "R3",
+            "shift_z": 0,
+            "shift_y": -0,
+            "csv_file": "R3_amp_ratio.csv"
+        },
+        {
+            "legend": "R7",
+            "shift_z": -0,
+            "shift_y": -0,
+            "csv_file": "R7_amp_ratio.csv"
+        },
+        {
+            "legend": "R15",
+            "shift_z": -0,
+            "shift_y": 0,
+            "csv_file": "R15_amp_ratio.csv"
+        }
+    ]
+}
