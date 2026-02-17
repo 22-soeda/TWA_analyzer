@@ -1,0 +1,21 @@
+{
+    "z_position_um_mean": -0.8999999999999998,
+    "convergence_settings": {
+        "average_count": 30,
+        "duration_used_sec": 30.0
+    },
+    "results": {
+        "R_V": {
+            "mean": 5.758893368099999e-08,
+            "std": 6.490546746402913e-10
+        },
+        "Theta_deg": {
+            "mean": -23.937441698733334,
+            "std": 0.49149391907585577
+        },
+        "Frequency_Hz": {
+            "mean": 32.0001393001
+        }
+    },
+    "timestamp": "2026-02-17T16:34:30.759042"
+}

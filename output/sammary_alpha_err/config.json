@@ -1,0 +1,36 @@
+{
+    "xlabel": "Z Position [um]",
+    "ylabel": "Thermal Diffusivity [m$^2$/s]",
+    "headers": {
+        "x": "z_position",
+        "y": "alpha",
+        "y_upper": "alpha_upper",
+        "y_lower": "alpha_lower"
+    },
+    "plots": [
+        {
+            "legend": "R1.5",
+            "shift_z": -0.9,
+            "shift_y": 0,
+            "csv_file": "R1.5_alpha_err.csv"
+        },
+        {
+            "legend": "R3",
+            "shift_z": -0.9,
+            "shift_y": -0,
+            "csv_file": "R3_alpha_err.csv"
+        },
+        {
+            "legend": "R7",
+            "shift_z": -1,
+            "shift_y": -0,
+            "csv_file": "R7_alpha_err.csv"
+        },
+        {
+            "legend": "R15",
+            "shift_z": 1.7,
+            "shift_y": 0,
+            "csv_file": "R15_alpha_err.csv"
+        }
+    ]
+}

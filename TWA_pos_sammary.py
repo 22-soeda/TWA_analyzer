@@ -18,20 +18,17 @@ AXIS_LABELS = {
 
 # グラフ描画設定
 PLOT_SETTINGS = {
-    "fig_size": (8, 9),      # 画像全体のサイズ (縦長に変更: 8x6 -> 8x9)
-                             # 枠が正方形(aspect=1)の場合、縦に2つ並べるなら縦長のキャンバスが推奨されます
-    "font_size_label": 16,   # 軸ラベルのフォントサイズ
-    "font_size_tick": 18,    # 目盛りのフォントサイズ
-    "box_aspect": 0.6,       # グラフ枠の縦横比 (1.0 = 正方形)
-    "marker_size": 8,        # プロットの点のサイズ
-    "show_grid": False,      # グリッドの表示有無
-    "hspace": 0.1,           # ★上下グラフの隙間 (0に近いほど狭い)
+    "fig_size": (8, 9),      
+    "font_size_label": 16,   
+    "font_size_tick": 18,    
+    "box_aspect": 0.6,       
+    "marker_size": 8,        
+    "show_grid": False,      
+    "hspace": 0.1,           
     
-    # 軸目盛りの表示形式設定
     "use_scientific_notation": True,
     "scilimits": (-3, 3),
     
-    # 目盛りの密度（刻み幅）
     "x_tick_step": None,
     "y_tick_step": None
 }
@@ -162,67 +159,57 @@ def run_summary():
     df = df.sort_values(by=TARGET_AXIS)
     
     print(f"集計データ数: {len(df)}")
-    print(df[[TARGET_AXIS, "alpha_phase", "alpha_ratio"]].head())
-
+    
+    # --- JSONの保存 ---
     summary_json_path = os.path.join(target_dir, "summary_results.json")
     df.to_json(summary_json_path, orient='records', indent=4)
     print(f"\nSaved Summary JSON: {summary_json_path}")
 
-    # --- プロット作成関数 (単一グラフ) ---
+    # --- CSVの保存 (z, thermal diffusivity) ---
+    # 必要な列を抽出し、指定のヘッダー名に変更
+    csv_df = df[[TARGET_AXIS, "alpha_phase"]].copy()
+    csv_df.columns = ["z", "thermal_diffusivity"]
+    
+    summary_csv_path = os.path.join(target_dir, "summary_results.csv")
+    csv_df.to_csv(summary_csv_path, index=False, encoding='utf-8')
+    print(f"Saved Summary CSV: {summary_csv_path}")
+
+    # --- プロット作成関数などは変更なし ---
     def save_plot(x, y, ylabel, filename, color, is_ratio=False):
         if len(x) == 0: return
-
         fig, ax = plt.subplots(figsize=PLOT_SETTINGS["fig_size"])
         ax.plot(x, y, marker='o', linestyle='None', color=color, 
                 markersize=PLOT_SETTINGS["marker_size"])
         xlabel = AXIS_LABELS.get(TARGET_AXIS, f"{TARGET_AXIS} [um]")
         apply_plot_style(ax, xlabel, ylabel)
         _apply_axis_settings(ax, x.values, y.values, is_ratio=is_ratio)
-        
         save_path = os.path.join(target_dir, filename)
-        # 単一プロットは tight_layout を使って問題ない
         plt.savefig(save_path, dpi=100, bbox_inches='tight')
         plt.close(fig)
         print(f"Saved Plot: {save_path}")
 
-    # --- スタックプロット作成関数 ---
     def save_stacked_plot(df, filename):
         if len(df) == 0: return
-
-        # 縦に2つ並べる
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=PLOT_SETTINGS["fig_size"], sharex=True)
-        
-        # 上段
         ax1.plot(df[TARGET_AXIS], df["alpha_phase"], marker='o', linestyle='None', 
                  markersize=PLOT_SETTINGS["marker_size"], color='orange')
         apply_plot_style(ax1, ylabel=r"Thermal Diffusivity [m$^2$/s]")
         _apply_axis_settings(ax1, df[TARGET_AXIS].values, df["alpha_phase"].values, is_ratio=False)
-        
-        # 下段
         ax2.plot(df[TARGET_AXIS], df["alpha_ratio"], marker='o', linestyle='None', 
                  markersize=PLOT_SETTINGS["marker_size"], color='green')
         xlabel = AXIS_LABELS.get(TARGET_AXIS, f"{TARGET_AXIS} [um]")
         apply_plot_style(ax2, xlabel=xlabel, ylabel="Alpha Ratio")
         _apply_axis_settings(ax2, df[TARGET_AXIS].values, df["alpha_ratio"].values, is_ratio=True)
-
-        # ★重要: tight_layout をやめて subplots_adjust で隙間(hspace)を直接指定する
-        # box_aspect固定時は tight_layout が隙間を広げすぎる原因になるため
         plt.subplots_adjust(hspace=PLOT_SETTINGS["hspace"])
-        
         save_path = os.path.join(target_dir, filename)
-        # bbox_inches='tight' で外側の余白だけを最後にカットする
         plt.savefig(save_path, dpi=100, bbox_inches='tight')
         plt.close(fig)
         print(f"Saved Stacked Plot: {save_path}")
 
-    save_plot(
-        df[TARGET_AXIS], df["alpha_phase"], ylabel=r"Thermal Diffusivity [m$^2$/s]", 
-        filename="summary_pos_alpha.png", color="orange", is_ratio=False
-    )
-    save_plot(
-        df[TARGET_AXIS], df["alpha_ratio"], ylabel="Alpha Ratio", 
-        filename="summary_pos_ratio.png", color="green", is_ratio=True
-    )
+    save_plot(df[TARGET_AXIS], df["alpha_phase"], ylabel=r"Thermal Diffusivity [m$^2$/s]", 
+              filename="summary_pos_alpha.png", color="orange", is_ratio=False)
+    save_plot(df[TARGET_AXIS], df["alpha_ratio"], ylabel="Alpha Ratio", 
+              filename="summary_pos_ratio.png", color="green", is_ratio=True)
     save_stacked_plot(df, "summary_pos_stacked.png")
 
     print("\n=== 集計完了 ===")
