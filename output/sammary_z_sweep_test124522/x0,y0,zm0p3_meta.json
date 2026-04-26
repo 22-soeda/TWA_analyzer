@@ -1,0 +1,159 @@
+{
+  "meta_map": {
+    "config": "data_logger_node\\header_map.yaml",
+    "format": {
+      "column": "description"
+    },
+    "Sys_Timestamp": "System wall-clock timestamp (Unix seconds).",
+    "Elapsed_s": "Elapsed seconds from first publisher start.",
+    "Stage_X_um": "Stage X position in micrometers.",
+    "Stage_Y_um": "Stage Y position in micrometers.",
+    "Stage_Z_um": "Stage Z position in micrometers.",
+    "Stage_Connected": "Stage node connection status.",
+    "Stage_Status": "Stage node status text.",
+    "Stage_IsMock": "Stage node running in mock mode.",
+    "LI_Amp": "Lock-in amplitude R.",
+    "LI_Theta_deg": "Lock-in phase theta (degree).",
+    "LI_RefFreq_Hz": "Lock-in detected reference frequency (Hz).",
+    "LI_Connected": "Lock-in node connection status.",
+    "LI_Status": "Lock-in node status text.",
+    "LI_AutoAdjustActive": "Lock-in auto-adjust flag.",
+    "LI_AutoAdjustKind": "Lock-in auto-adjust mode.",
+    "FG_Freq_Hz": "Function generator output frequency (Hz).",
+    "FG_Amp": "Function generator output amplitude (Vpp).",
+    "FG_Offset_V": "Function generator output offset (V).",
+    "FG_Waveform": "Function generator waveform name.",
+    "FG_Output": "Function generator output enabled flag.",
+    "RAW_Unmapped": "JSON of source fields not mapped in this config."
+  },
+  "meta_items": [
+    {
+      "section": "config",
+      "value": "data_logger_node\\header_map.yaml"
+    },
+    {
+      "section": "format",
+      "key": "column",
+      "value": "description"
+    },
+    {
+      "section": "Sys_Timestamp",
+      "value": "System wall-clock timestamp (Unix seconds)."
+    },
+    {
+      "section": "Elapsed_s",
+      "value": "Elapsed seconds from first publisher start."
+    },
+    {
+      "section": "Stage_X_um",
+      "value": "Stage X position in micrometers."
+    },
+    {
+      "section": "Stage_Y_um",
+      "value": "Stage Y position in micrometers."
+    },
+    {
+      "section": "Stage_Z_um",
+      "value": "Stage Z position in micrometers."
+    },
+    {
+      "section": "Stage_Connected",
+      "value": "Stage node connection status."
+    },
+    {
+      "section": "Stage_Status",
+      "value": "Stage node status text."
+    },
+    {
+      "section": "Stage_IsMock",
+      "value": "Stage node running in mock mode."
+    },
+    {
+      "section": "LI_Amp",
+      "value": "Lock-in amplitude R."
+    },
+    {
+      "section": "LI_Theta_deg",
+      "value": "Lock-in phase theta (degree)."
+    },
+    {
+      "section": "LI_RefFreq_Hz",
+      "value": "Lock-in detected reference frequency (Hz)."
+    },
+    {
+      "section": "LI_Connected",
+      "value": "Lock-in node connection status."
+    },
+    {
+      "section": "LI_Status",
+      "value": "Lock-in node status text."
+    },
+    {
+      "section": "LI_AutoAdjustActive",
+      "value": "Lock-in auto-adjust flag."
+    },
+    {
+      "section": "LI_AutoAdjustKind",
+      "value": "Lock-in auto-adjust mode."
+    },
+    {
+      "section": "FG_Freq_Hz",
+      "value": "Function generator output frequency (Hz)."
+    },
+    {
+      "section": "FG_Amp",
+      "value": "Function generator output amplitude (Vpp)."
+    },
+    {
+      "section": "FG_Offset_V",
+      "value": "Function generator output offset (V)."
+    },
+    {
+      "section": "FG_Waveform",
+      "value": "Function generator waveform name."
+    },
+    {
+      "section": "FG_Output",
+      "value": "Function generator output enabled flag."
+    },
+    {
+      "section": "RAW_Unmapped",
+      "value": "JSON of source fields not mapped in this config."
+    }
+  ],
+  "raw_meta_lines": [
+    "#META,config,data_logger_node\\header_map.yaml",
+    "#META,format,column,description",
+    "#META,Sys_Timestamp,System wall-clock timestamp (Unix seconds).",
+    "#META,Elapsed_s,Elapsed seconds from first publisher start.",
+    "#META,Stage_X_um,Stage X position in micrometers.",
+    "#META,Stage_Y_um,Stage Y position in micrometers.",
+    "#META,Stage_Z_um,Stage Z position in micrometers.",
+    "#META,Stage_Connected,Stage node connection status.",
+    "#META,Stage_Status,Stage node status text.",
+    "#META,Stage_IsMock,Stage node running in mock mode.",
+    "#META,LI_Amp,Lock-in amplitude R.",
+    "#META,LI_Theta_deg,Lock-in phase theta (degree).",
+    "#META,LI_RefFreq_Hz,Lock-in detected reference frequency (Hz).",
+    "#META,LI_Connected,Lock-in node connection status.",
+    "#META,LI_Status,Lock-in node status text.",
+    "#META,LI_AutoAdjustActive,Lock-in auto-adjust flag.",
+    "#META,LI_AutoAdjustKind,Lock-in auto-adjust mode.",
+    "#META,FG_Freq_Hz,Function generator output frequency (Hz).",
+    "#META,FG_Amp,Function generator output amplitude (Vpp).",
+    "#META,FG_Offset_V,Function generator output offset (V).",
+    "#META,FG_Waveform,Function generator waveform name.",
+    "#META,FG_Output,Function generator output enabled flag.",
+    "#META,RAW_Unmapped,JSON of source fields not mapped in this config."
+  ],
+  "input_file": "C:\\Users\\soeda\\TWA_analyzer\\data_raw\\z_freq_sweep_test01_20260421_124522\\data_1.csv",
+  "position_key": "x0.0_y0.0_z-0.3",
+  "position": {
+    "x_um": 0.0,
+    "y_um": 0.0,
+    "z_um": -0.3
+  },
+  "rows": 634,
+  "freq_tolerance_hz": 3.0,
+  "output_csv": "C:\\Users\\soeda\\TWA_analyzer\\output\\sammary_z_sweep_test124522\\x0,y0,zm0p3.csv"
+}

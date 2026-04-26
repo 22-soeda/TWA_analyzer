@@ -36,6 +36,9 @@ class ColumnConfig:
 
     SEPARATOR: str = "\t"
 
+    # データロガー CSV 正規化時: TWA の周波数 f [Hz] はロックイン参照周波数を優先し、
+    # 無い場合のみ FG を使う（thermal_analysis/file_parser.py と整合）。
+
 @dataclass(frozen=True)
 class AnalysisConfig:
     """解析ロジックやパラメータに関する設定"""

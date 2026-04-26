@@ -1,0 +1,15 @@
+[project]
+name = "twa-analyzer"
+version = "0.1.0"
+description = "TWA measurement data analysis and plotting utilities"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "matplotlib",
+    "numpy",
+    "pandas",
+    "scipy",
+]
+
+[tool.uv]
+package = false

@@ -41,8 +41,19 @@ def run_twa_analyzer(request: TwaAnalyzerRequest) -> TwaAnalyzerResponse:
     if os.path.isfile(target_path):
         files = [target_path]
     else:
-        pattern = os.path.join(target_path, "**", "*.txt") if request.recursive else os.path.join(target_path, "*.txt")
-        files = glob.glob(pattern, recursive=request.recursive)
+        if request.recursive:
+            patterns = [
+                os.path.join(target_path, "**", "*.txt"),
+                os.path.join(target_path, "**", "*.csv"),
+            ]
+        else:
+            patterns = [
+                os.path.join(target_path, "*.txt"),
+                os.path.join(target_path, "*.csv"),
+            ]
+        files = sorted(
+            {p for pattern in patterns for p in glob.glob(pattern, recursive=request.recursive)}
+        )
 
     os.makedirs(target_output_dir, exist_ok=True)
 

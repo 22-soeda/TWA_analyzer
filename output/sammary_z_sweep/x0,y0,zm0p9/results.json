@@ -1,0 +1,33 @@
+{
+    "filename": "c:\\Users\\soeda\\TWA_analyzer\\output\\sammary_z_sweep\\x0,y0,zm0p9.csv",
+    "samplename": null,
+    "thickness_um": 50.0,
+    "alpha_phase": 1.8715586406453465e-06,
+    "r2_phase": 0.8178646850940998,
+    "slope_phase": -0.0647803397022813,
+    "intercept_phase": 3.34582091817237,
+    "alpha_amp": 1.6037000155611436e-06,
+    "r2_amp": 0.765101893895571,
+    "slope_amp": -0.06998152045765609,
+    "intercept_amp": -7.753712105467067,
+    "alpha_ratio": 0.8568793842378134,
+    "x_position": null,
+    "y_position": null,
+    "z_position": null,
+    "used_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+    ],
+    "freq_range_min": 8.485225702743563,
+    "freq_range_max": 33.94082469480723,
+    "kd_min": 0.5496758034742565,
+    "kd_max": 2.19869815350519
+}
