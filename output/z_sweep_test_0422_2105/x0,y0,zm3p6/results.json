@@ -1,5 +1,5 @@
 {
-    "filename": "c:\\Users\\soeda\\TWA_analyzer\\data_raw\\z_freq_sweep_test0422_20260422_210553\\data_1_pos_freq_summary\\x0,y0,zm3p6.csv",
+    "filename": "c:\\Users\\soeda\\TWA_analyzer\\output\\z_sweep_test_0422_2105\\pos_sammarized\\x0,y0,zm3p6.csv",
     "samplename": null,
     "thickness_um": 50.0,
     "alpha_phase": 7.675009686243044e-07,
@@ -11,9 +11,9 @@
     "slope_amp": -0.10222816845884135,
     "intercept_amp": -7.081278583892294,
     "alpha_ratio": 0.9791963573415261,
-    "x_position": null,
-    "y_position": null,
-    "z_position": null,
+    "x_position": 0.0,
+    "y_position": 0.0,
+    "z_position": -3.6,
     "used_indices": [
         1,
         2,

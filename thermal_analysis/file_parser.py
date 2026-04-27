@@ -26,6 +26,15 @@ def _canonical_twa_column_names() -> Tuple[str, str, str, str]:
         return "sqrt_TW_freq", "amp", "theta", "z_pos"
 
 
+def _canonical_twa_position_keys() -> Tuple[str, str, str]:
+    """解析結果に反映する座標メタデータのキー名。"""
+    try:
+        c = config.columns
+        return c.X_POS, c.Y_POS, c.Z_POS
+    except ImportError:
+        return "x_pos", "y_pos", "z_pos"
+
+
 def _load_csv_table(filepath: str) -> pd.DataFrame:
     """#META 行付きのデータロガー CSV 等を読み込む（# で始まる行はスキップ）。"""
     last_err: Exception | None = None
@@ -39,6 +48,39 @@ def _load_csv_table(filepath: str) -> pd.DataFrame:
     return pd.read_csv(filepath, comment="#")
 
 
+def _load_csv_meta(filepath: str) -> Dict[str, float]:
+    """CSV先頭の #META 行から座標メタデータを読み込む。"""
+    x_key, y_key, z_key = _canonical_twa_position_keys()
+    key_map = {"x_pos": x_key, "y_pos": y_key, "z_pos": z_key}
+    metadata: Dict[str, float] = {}
+    last_err: Exception | None = None
+    lines = None
+    for enc in ("utf-8-sig", "utf-8", "cp932"):
+        try:
+            with open(filepath, "r", encoding=enc) as f:
+                lines = f.readlines()
+            break
+        except UnicodeDecodeError as e:
+            last_err = e
+    if lines is None:
+        if last_err:
+            raise last_err
+        return metadata
+
+    for raw_line in lines:
+        line = raw_line.strip()
+        if not line.startswith("#META,"):
+            continue
+        parts = [p.strip() for p in line.split(",")]
+        if len(parts) >= 4:
+            meta_key = key_map.get(parts[2], parts[2])
+            try:
+                metadata[meta_key] = float(parts[3])
+            except ValueError:
+                pass
+    return metadata
+
+
 def _ensure_twa_canonical_columns(df: pd.DataFrame, metadata: Dict[str, float]) -> None:
     """
     TWA 解析用の列（sqrt_TW_freq, amp, theta）が無い場合、
@@ -47,6 +89,7 @@ def _ensure_twa_canonical_columns(df: pd.DataFrame, metadata: Dict[str, float]) 
     既に canonical 列が揃っていれば何もしない。
     """
     sqrt_n, amp_n, phase_n, z_key = _canonical_twa_column_names()
+    x_key, y_key, _ = _canonical_twa_position_keys()
     if sqrt_n in df.columns and amp_n in df.columns and phase_n in df.columns:
         return
 
@@ -76,10 +119,19 @@ def _ensure_twa_canonical_columns(df: pd.DataFrame, metadata: Dict[str, float]) 
     theta_deg = pd.to_numeric(df["LI_Theta_deg"], errors="coerce").to_numpy(dtype=float)
     df[phase_n] = np.deg2rad(theta_deg)
 
-    if "Stage_Z_um" in df.columns:
-        z_vals = pd.to_numeric(df["Stage_Z_um"], errors="coerce")
-        if z_vals.notna().any():
-            metadata[z_key] = float(z_vals.mean())
+    # 座標フラグ列（x_pos/y_pos/z_pos）を優先し、無ければ Stage_*_um から補完
+    for meta_key, preferred_col, fallback_col in (
+        (x_key, x_key, "Stage_X_um"),
+        (y_key, y_key, "Stage_Y_um"),
+        (z_key, z_key, "Stage_Z_um"),
+    ):
+        if meta_key in metadata:
+            continue
+        source_col = preferred_col if preferred_col in df.columns else fallback_col
+        if source_col in df.columns:
+            vals = pd.to_numeric(df[source_col], errors="coerce")
+            if vals.notna().any():
+                metadata[meta_key] = float(vals.mean())
 
 
 def unwrap_phase_custom(phase_data: np.ndarray, period: float = np.pi, threshold: float = 3.0) -> np.ndarray:
@@ -131,7 +183,7 @@ def load_from_text(filepath: str, sep: str = "\t") -> RawData:
     if ext == ".csv":
         df = _load_csv_table(filepath)
         df.columns = [c.strip() for c in df.columns]
-        metadata: Dict[str, float] = {}
+        metadata: Dict[str, float] = _load_csv_meta(filepath)
         _ensure_twa_canonical_columns(df, metadata)
         if PHASE_COL_NAME in df.columns:
             df = adjust_phase_continuity(df, PHASE_COL_NAME)
