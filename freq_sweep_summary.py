@@ -172,7 +172,11 @@ def run(input_csv: str, output_dir: str, tolerance_hz: float) -> None:
             used_filenames[out_name] = 1
         out_csv_path = os.path.join(output_dir, out_name)
         summary = summarize_position(part, tolerance_hz=tolerance_hz)
-        summary.to_csv(out_csv_path, index=False, columns=OUTPUT_COLUMNS)
+        with open(out_csv_path, "w", encoding="utf-8", newline="") as f:
+            f.write(f"#META,position,x_pos,{x:.6f}\n")
+            f.write(f"#META,position,y_pos,{y:.6f}\n")
+            f.write(f"#META,position,z_pos,{z:.6f}\n")
+            summary.to_csv(f, index=False, columns=OUTPUT_COLUMNS)
 
     meta_summary = dict(base_metadata)
     meta_summary["freq_tolerance_hz"] = float(tolerance_hz)

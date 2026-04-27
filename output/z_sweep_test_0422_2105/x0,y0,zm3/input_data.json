@@ -1,6 +1,10 @@
 {
-    "metadata": {},
-    "filepath": "c:\\Users\\soeda\\TWA_analyzer\\data_raw\\z_freq_sweep_test0422_20260422_210553\\data_1_pos_freq_summary\\x0,y0,zm3.csv",
+    "metadata": {
+        "x_pos": 0.0,
+        "y_pos": 0.0,
+        "z_pos": -3.0
+    },
+    "filepath": "c:\\Users\\soeda\\TWA_analyzer\\output\\z_sweep_test_0422_2105\\pos_sammarized\\x0,y0,zm3.csv",
     "dataframe": {
         "index": [
             0,

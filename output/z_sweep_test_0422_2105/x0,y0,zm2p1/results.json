@@ -1,19 +1,19 @@
 {
-    "filename": "c:\\Users\\soeda\\TWA_analyzer\\data_raw\\z_freq_sweep_test0422_20260422_210553\\data_1_pos_freq_summary\\x0,y0,zm2p1.csv",
+    "filename": "c:\\Users\\soeda\\TWA_analyzer\\output\\z_sweep_test_0422_2105\\pos_sammarized\\x0,y0,zm2p1.csv",
     "samplename": null,
     "thickness_um": 50.0,
-    "alpha_phase": 8.37927155114449e-07,
-    "r2_phase": 0.9952212143147463,
-    "slope_phase": -0.09681481237970489,
-    "intercept_phase": 3.750698267222933,
-    "alpha_amp": 5.198197906774222e-07,
-    "r2_amp": 0.9897095622299065,
-    "slope_amp": -0.12291886336659064,
-    "intercept_amp": -6.904143401311632,
-    "alpha_ratio": 0.6203639391617786,
-    "x_position": null,
-    "y_position": null,
-    "z_position": null,
+    "alpha_phase": 8.3972904586913e-07,
+    "r2_phase": 0.9966382580894291,
+    "slope_phase": -0.09671088397547677,
+    "intercept_phase": 3.748832050368712,
+    "alpha_amp": 8.923142407384037e-07,
+    "r2_amp": 0.8081244357144466,
+    "slope_amp": -0.09381796935950383,
+    "intercept_amp": -7.42670101462515,
+    "alpha_ratio": 0.9410687485770051,
+    "x_position": 0.0,
+    "y_position": 0.0,
+    "z_position": -2.1,
     "used_indices": [
         2,
         3,
@@ -22,10 +22,11 @@
         6,
         7,
         8,
-        9
+        9,
+        10
     ],
     "freq_range_min": 11.313661683003325,
-    "freq_range_max": 31.112613412226665,
-    "kd_min": 1.0953300331674232,
-    "kd_max": 3.0121618301470146
+    "freq_range_max": 33.94114423378191,
+    "kd_min": 1.0941542223627319,
+    "kd_max": 3.282478061988205
 }

@@ -1,0 +1,5 @@
+#META,position,x_pos,0.000000
+#META,position,y_pos,0.000000
+#META,position,z_pos,0.000000
+sqrt_TW_freq,theta,theta_sigma,amp,amp_sigma
+31.622776601683793,0.7806335856206318,2.242358317836009,6.999948191235539e-07,1.4067843094341257e-09
